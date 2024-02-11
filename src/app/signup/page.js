@@ -6,18 +6,19 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { initializeFirebaseApp } from '../services/firebaseClient';
 import { CircularProgress } from '@mui/material';
+import { IconButton, InputAdornment, OutlinedInput } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-export default function Home() {
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { initializeFirebaseApp } from '../../services/firebaseClient';
+
+export default function SignUp() {
   const router = useRouter();
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -58,20 +59,19 @@ export default function Home() {
       setLoading(true);
       initializeFirebaseApp();
       const auth = getAuth();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log('User signed in:', user.uid);
-      router.replace( `/home?userId=${user.uid}`);
+      console.log('User signed up:', user.uid);
+      router.replace(`/home?userId=${user.uid}`);
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error('Error signing in:', error.message);
+      console.error('Error signing up:', error.message);
       throw error;
     }
   };
 
   return (
-
     <Grid container component="main" sx={{ height: '100vh' }}>
       <CssBaseline />
       <Grid
@@ -96,7 +96,7 @@ export default function Home() {
           }}
         >
           <Typography variant="h3" sx={{ my: 2 }}>
-            WELCOME BACK!
+            WELCOME!
           </Typography>
           <Typography variant="h4" sx={{ my: 1 }}>
             Redefine your AI Experience
@@ -132,6 +132,16 @@ export default function Home() {
                 autoComplete="current-password"
                 error={passwordError}
                 helperText={passwordError ? 'Please enter a password' : ''}
+              // endAdornment={
+              //   <InputAdornment position="end">
+              //     <IconButton
+              //       aria-label="toggle password visibility"
+              //       onClick={togglePasswordVisibility}
+              //       edge="end" >
+              //     </IconButton>
+              //     {showPassword ? <VisibilityOff /> : <Visibility />}
+              //   </InputAdornment>
+              // }
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -144,18 +154,8 @@ export default function Home() {
                   size="large"
                   sx={{ mt: 3, mb: 2 }}
                 >
-                  Sign In
+                  Sign Up
                 </Button>)}
-              </Grid>
-              <Grid container>
-                <Grid item xs>
-                </Grid>
-                <Grid item>
-                  New User?
-                  <Link href="/signup" sx={{ ml: 1 }}>
-                    {"Sign Up"}
-                  </Link>
-                </Grid>
               </Grid>
             </Box>
           </Box>
