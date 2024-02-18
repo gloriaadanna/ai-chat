@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
@@ -11,8 +11,8 @@ import TextField from '@mui/material/TextField';
 import PromptCard from './../../components/promptCard';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import SendIcon from '@mui/icons-material/Send';
-import { Typography } from '@mui/material';
-import { collection, addDoc } from "firebase/firestore"; 
+import { Typography, CircularProgress } from '@mui/material';
+import { collection, addDoc, query, getDocs, where, orderBy, limit } from "firebase/firestore"; 
 
 import { ChatGPTAPI } from 'chatgpt'
 import { db } from '@/services/firebaseClient';
@@ -21,8 +21,31 @@ export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [promptError, setPromptError] = useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const prompts = [];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const userId = searchParams.get('userId');
+        const promptsRef = collection(db, "prompts");
+        const q = query(promptsRef, where("userId", "==", userId), orderBy("createdDate", "desc"), limit(5));
+        const querySnapshot = await getDocs(q);
+        let prompts = [];
+        querySnapshot.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          var firestoreData = doc.data();
+          console.log(doc.id, " => ", firestoreData);
+          prompts.push({ "id": doc.id, "prompt": firestoreData.prompt, "result": firestoreData.result });
+        });
+        setData(prompts);
+      } catch (error) {
+        console.error('Error fetching data from Firestore: ', error);
+        return [];
+      }
+    }
+    fetchData();
+  }, []);
 
   function validatePrompt(email) {
     if (email === '') {
@@ -34,32 +57,41 @@ export default function Home() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const prompt = data.get('prompt');
+    const formData = new FormData(event.currentTarget);
+    const prompt = formData.get('prompt');
     console.log(prompt);
     if (validatePrompt(prompt)) {
       console.log('Prompt validation failed');
       return;
     }
-
+    
+    setLoading(true);
     const api = new ChatGPTAPI({
-      apiKey: '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',
+      apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
       fetch: self.fetch.bind(self),
     });
     try {
       var response = await api.sendMessage(prompt);
-      const userId = searchParams.get('userId')
+      console.log(response);
+      const userId = searchParams.get('userId');
+      const createdDate = new Date();
       const docRef = await addDoc(collection(db, "prompts"), {
         userId: userId,
         prompt: prompt,
         result: response.text,
+        createdDate: createdDate,
       });
       console.log("Document written with ID: ", docRef.id);
+      const newPrompt = { "id": docRef.id, "prompt": prompt, "result": response.text, "createdDate": createdDate };
+      console.log("new prompt => ", newPrompt);
+      let updatedData = [newPrompt];
+      setData(updatedData.concat(data));
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
       throw error;
     }
-
   }
 
   return (
@@ -95,7 +127,6 @@ export default function Home() {
                 id="prompt"
                 label="Prompt"
                 name="prompt"
-                autoComplete="email"
                 autoFocus
                 multiline
                 rows={6}
@@ -104,7 +135,7 @@ export default function Home() {
               />
 
               <Grid container justifyContent="flex-end">
-                <Button
+                {loading ? (<CircularProgress size={25} sx={{my: 4}} />) : (<Button
                   type="submit"
                   variant="contained"
                   size="large"
@@ -112,7 +143,7 @@ export default function Home() {
                   endIcon={<SendIcon />}
                 >
                   Submit
-                </Button>
+                </Button>)}
               </Grid>
             </Box>
           </Box>
@@ -122,7 +153,8 @@ export default function Home() {
             size="large"
             sx={{ mx: 3, mb: 0.5, display: "flex", justifyContent: "end", alignItems: "flex-end" }}
             onClick={() => {
-              router.push('/history');
+              const userId = searchParams.get('userId');
+              router.push(`/history?userId=${userId}`);
             }}
           >
             History
@@ -150,12 +182,12 @@ export default function Home() {
               alignItems: 'left',
             }}
           >
-            {prompts.length === 0
+            {data.length === 0
               ? <Typography variant="h4" sx={{ my: 2 }}>
                 Enter a prompt to start chatting!
               </Typography>
-              : prompts.map((item) => (
-                <PromptCard {...item} />
+              : data.map((item) => (
+                <PromptCard key={item.id} {...item} />
               ))}
           </Box>
         </Grid>
