@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
@@ -12,7 +12,7 @@ import PromptCard from './../../components/promptCard';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import { Typography, CircularProgress } from '@mui/material';
-import { collection, addDoc, query, getDocs, where, orderBy, limit } from "firebase/firestore"; 
+import { collection, addDoc, query, getDocs, where, orderBy, limit } from "firebase/firestore";
 
 import { ChatGPTAPI } from 'chatgpt'
 import { db } from '@/services/firebaseClient';
@@ -45,7 +45,7 @@ export default function Home() {
       }
     }
     fetchData();
-  }, []);
+  }, [searchParams]);
 
   function validatePrompt(email) {
     if (email === '') {
@@ -64,7 +64,7 @@ export default function Home() {
       console.log('Prompt validation failed');
       return;
     }
-    
+
     setLoading(true);
     const api = new ChatGPTAPI({
       apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -95,6 +95,8 @@ export default function Home() {
   }
 
   return (
+    <Suspense>
+
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -135,7 +137,7 @@ export default function Home() {
               />
 
               <Grid container justifyContent="flex-end">
-                {loading ? (<CircularProgress size={25} sx={{my: 4}} />) : (<Button
+                {loading ? (<CircularProgress size={25} sx={{ my: 4 }} />) : (<Button
                   type="submit"
                   variant="contained"
                   size="large"
@@ -192,5 +194,6 @@ export default function Home() {
           </Box>
         </Grid>
       </Grid>
+    </Suspense>
   );
 }

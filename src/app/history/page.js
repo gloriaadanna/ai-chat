@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
@@ -30,32 +30,35 @@ export default function History() {
           console.log(doc.id, " => ", firestoreData);
           prompts.push({ "id": doc.id, "prompt": firestoreData.prompt, "result": firestoreData.result });
         });
-       setData(prompts); 
-      }catch(error){
+        setData(prompts);
+      } catch (error) {
         console.error('Error fetching data from Firestore: ', error);
         return [];
       }
     }
     fetchData();
-  }, []);
+  }, [searchParams]);
 
-  return (<Grid container component="main" sx={{ height: '100vh' }}>
-    <CssBaseline />
-
-    <Grid item md={12} component={Paper} elevation={0} square>
-      <Box
-        sx={{
-          my: 4,
-          mx: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'left',
-        }}
-      >
-        {data.map((item) => (
-          <PromptCard key={data.id} {...item} />
-        ))}
-      </Box>
-    </Grid>
-  </Grid>);
+  return (
+    <Suspense>
+      <Grid container component="main" sx={{ height: '100vh' }}>
+        <CssBaseline />
+        <Grid item md={12} component={Paper} elevation={0} square>
+          <Box
+            sx={{
+              my: 4,
+              mx: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'left',
+            }}
+          >
+            {data.map((item) => (
+              <PromptCard key={data.id} {...item} />
+            ))}
+          </Box>
+        </Grid>
+      </Grid>
+    </Suspense>
+  );
 }
