@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import PromptCard from './../../components/promptCard';
+import PromptCard from '../../components/PromptCard';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import { Typography, CircularProgress } from '@mui/material';
@@ -96,7 +96,6 @@ export default function Home() {
 
   return (
     <Suspense>
-
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
