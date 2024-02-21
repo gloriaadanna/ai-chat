@@ -14,8 +14,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { initializeFirebaseApp } from '../services/firebaseClient';
 import { CircularProgress } from '@mui/material';
+import { initializeFirebaseApp } from '@/services/firebaseClient';
 
 export default function Home() {
   const router = useRouter();

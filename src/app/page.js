@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Container, Typography, Box, Button } from '@mui/material';
-import Link from 'next/link';
 
 export default function Home() {
   const router = useRouter();

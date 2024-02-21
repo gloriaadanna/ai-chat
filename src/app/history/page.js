@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import PromptCard from '../../components/PromptCard';
+import PromptCard from '@/components/PromptCard';
 import { collection, query, getDocs, where, orderBy } from "firebase/firestore";
 
 import { db } from '@/services/firebaseClient';
