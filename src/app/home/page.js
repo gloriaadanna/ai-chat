@@ -180,11 +180,11 @@ export default function Home() {
               alignItems: 'left',
             }}
           >
-            {data.length === 0
+            {history.length === 0
               ? <Typography variant="h4" sx={{ my: 2 }}>
                 Enter a prompt to start chatting!
               </Typography>
-              : data.map((item) => (
+              : history.map((item) => (
                 <PromptCard key={item.id} {...item} />
               ))}
           </Box>

@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import { CircularProgress } from '@mui/material';
 
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { initializeFirebaseApp } from '../../services/firebaseClient';
+import { initializeFirebaseApp } from '@/services/firebaseClient';
 
 export default function SignUp() {
   const router = useRouter();
