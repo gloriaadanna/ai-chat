@@ -14,29 +14,29 @@ import { db } from '@/services/firebaseClient';
 
 export default function History() {
   const searchParams = useSearchParams();
-  const [data, setData] = useState([]);
+  const [history, setPromptHistory] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
+    // fetch previous prompts and responses 
+    async function fetchQueriesAndResponses() {
       try {
         const userId = searchParams.get('userId');
         const promptsRef = collection(db, "prompts");
-        const q = query(promptsRef, where("userId", "==", userId), orderBy("createdDate", "desc"));
-        const querySnapshot = await getDocs(q);
+        const dataQuery = query(promptsRef, where("userId", "==", userId), orderBy("createdDate", "desc"));
+        const querySnapshot = await getDocs(dataQuery);
         let prompts = [];
         querySnapshot.forEach((doc) => {
-          // doc.data() is never undefined for query doc snapshots
           var firestoreData = doc.data();
-          console.log(doc.id, " => ", firestoreData);
           prompts.push({ "id": doc.id, "prompt": firestoreData.prompt, "result": firestoreData.result });
         });
-        setData(prompts);
+        // Update prompt state
+        setPromptHistory(prompts);
       } catch (error) {
         console.error('Error fetching data from Firestore: ', error);
         return [];
       }
     }
-    fetchData();
+    fetchQueriesAndResponses();
   }, [searchParams]);
 
   return (
@@ -53,8 +53,8 @@ export default function History() {
               alignItems: 'left',
             }}
           >
-            {data.map((item) => (
-              <PromptCard key={data.id} {...item} />
+            {history.map((item) => (
+              <PromptCard key={history.id} {...item} />
             ))}
           </Box>
         </Grid>

@@ -12,8 +12,6 @@ import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from '@mui/material';
-import { IconButton, InputAdornment, OutlinedInput } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { initializeFirebaseApp } from '../../services/firebaseClient';
@@ -42,13 +40,9 @@ export default function SignUp() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
-    console.log({
-      email: email,
-      password: password,
-    });
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email');
+    const password = formData.get('password');
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
     if (emailError || passwordError) {
@@ -61,7 +55,6 @@ export default function SignUp() {
       const auth = getAuth();
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log('User signed up:', user.uid);
       router.replace(`/home?userId=${user.uid}`);
       setLoading(false);
     } catch (error) {
@@ -88,8 +81,8 @@ export default function SignUp() {
       <Grid item xs={12} sm={8} md={6} component={Paper} elevation={4} square>
         <Box
           sx={{
-            my: 24,
-            mx: 22,
+            my: 2,
+            mx: 4,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'left',
@@ -101,63 +94,45 @@ export default function SignUp() {
           <Typography variant="h4" sx={{ my: 1 }}>
             Redefine your AI Experience
           </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                error={emailError}
-                helperText={emailError ? 'Please enter an email' : ''}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                error={passwordError}
-                helperText={passwordError ? 'Please enter a password' : ''}
-              // endAdornment={
-              //   <InputAdornment position="end">
-              //     <IconButton
-              //       aria-label="toggle password visibility"
-              //       onClick={togglePasswordVisibility}
-              //       edge="end" >
-              //     </IconButton>
-              //     {showPassword ? <VisibilityOff /> : <Visibility />}
-              //   </InputAdornment>
-              // }
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
-              <Grid container justifyContent="flex-end">
-                {loading ? (<CircularProgress size={25} />) : (<Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Sign Up
-                </Button>)}
-              </Grid>
-            </Box>
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              error={emailError}
+              helperText={emailError ? 'Please enter an email' : ''}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              error={passwordError}
+              helperText={passwordError ? 'Please enter a password' : ''}
+            />
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              label="Remember me"
+            />
+            <Grid container justifyContent="flex-end">
+              {loading ? (<CircularProgress size={25} />) : (<Button
+                type="submit"
+                variant="contained"
+                size="large"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign Up
+              </Button>)}
+            </Grid>
           </Box>
         </Box>
       </Grid>

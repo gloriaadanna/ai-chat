@@ -21,30 +21,31 @@ export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [promptError, setPromptError] = useState(false);
-  const [data, setData] = useState([]);
+  const [history, setPromptHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
+    // fetch previous prompts and responses 
+    async function fetchQueriesAndResponses() {
       try {
         const userId = searchParams.get('userId');
         const promptsRef = collection(db, "prompts");
-        const q = query(promptsRef, where("userId", "==", userId), orderBy("createdDate", "desc"), limit(5));
-        const querySnapshot = await getDocs(q);
+        const dataQuery = query(promptsRef, where("userId", "==", userId), orderBy("createdDate", "desc"), limit(5));
+        const querySnapshot = await getDocs(dataQuery);
         let prompts = [];
         querySnapshot.forEach((doc) => {
           // doc.data() is never undefined for query doc snapshots
           var firestoreData = doc.data();
-          console.log(doc.id, " => ", firestoreData);
           prompts.push({ "id": doc.id, "prompt": firestoreData.prompt, "result": firestoreData.result });
         });
-        setData(prompts);
+        // Update prompt state
+        setPromptHistory(prompts);
       } catch (error) {
         console.error('Error fetching data from Firestore: ', error);
         return [];
       }
     }
-    fetchData();
+    fetchQueriesAndResponses();
   }, [searchParams]);
 
   function validatePrompt(email) {
@@ -59,7 +60,6 @@ export default function Home() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const prompt = formData.get('prompt');
-    console.log(prompt);
     if (validatePrompt(prompt)) {
       console.log('Prompt validation failed');
       return;
@@ -72,7 +72,6 @@ export default function Home() {
     });
     try {
       var response = await api.sendMessage(prompt);
-      console.log(response);
       const userId = searchParams.get('userId');
       const createdDate = new Date();
       const docRef = await addDoc(collection(db, "prompts"), {
@@ -81,11 +80,9 @@ export default function Home() {
         result: response.text,
         createdDate: createdDate,
       });
-      console.log("Document written with ID: ", docRef.id);
       const newPrompt = { "id": docRef.id, "prompt": prompt, "result": response.text, "createdDate": createdDate };
-      console.log("new prompt => ", newPrompt);
       let updatedData = [newPrompt];
-      setData(updatedData.concat(data));
+      setPromptHistory(updatedData.concat(history));
       setLoading(false);
     } catch (error) {
       setLoading(false);
