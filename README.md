@@ -17,7 +17,7 @@ To set up this project locally, follow these steps:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/projectname.git
+git clone https://github.com/gloriaadanna/ai-chat.git
 cd projectname
 ```
 
@@ -63,4 +63,4 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ## Licensing
-This project is licensed under the MIT License. See the [LICENSE]() file for more information.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/gloriaadanna/ai-chat/blob/main/LICENSE.md) file for more information.
