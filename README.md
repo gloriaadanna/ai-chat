@@ -30,6 +30,17 @@ npm install
 
 3. To run the development server:
 
+Create a `.env.local` file at the root of your project
+Add the following environment variables to the `.env.local` file
+
+NEXT_PUBLIC_FIREBASE_API_KEY=*value*
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=*value*
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=*value*
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=*value*
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=*value*
+NEXT_PUBLIC_FIREBASE_APP_ID=*value*
+NEXT_PUBLIC_OPENAI_API_KEY=*value*
+
 ```bash
 npm run dev
 
